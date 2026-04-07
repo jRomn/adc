@@ -1,0 +1,7 @@
+version: "1.0.0"
+description: "EEG ADC pipeline for ESP32 — sampling, IIR filtering, blink detection, cognitive state classification"
+url: "https://github.com/your-username/eeg-adc-component"
+ targets: [esp32, esp32s2, esp32s3, esp32c3]                                          
+
+dependencies:
+  idf: ">=5.0.0"
