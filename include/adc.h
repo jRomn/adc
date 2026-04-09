@@ -1,6 +1,11 @@
 #ifndef ADC_H
 #define ADC_H
 
+/**
+ * @file adc.h
+ * @brief ADC Module Header File
+ */
+
 // =============================
 // Header Files 
 // =============================
@@ -8,7 +13,9 @@
     /* --- General --- */
     #include "freertos/FreeRTOS.h"
     #include "freertos/task.h"
-    #include "freertos/queue.h"     // For QueueHandle_t
+
+    /* --- Decoupling Queue --- */
+    #include "freertos/queue.h"
 
     /* --- ADC --- */
     #include "esp_adc/adc_oneshot.h"    // For ADC HW interation
@@ -64,30 +71,44 @@ void adc_push_sample(int16_t sample);
 // Main Functions: Public APIs
 // =============================
 
-    /* ---> STEP 1.1 : Initialize ADC Unit-> adc.c */
-    /* ADC Unit Initialization + Channel Configuration + Calibration */
-    adc_oneshot_unit_handle_t adc_init(void);
+    /* ADC Initialization */
+    /** 
+    * @brief Function to initialize the ADC unit and start sampling.
+    * @return ESP_OK on success.
+    * @return ESP_FAIL if the ADC could not be initialized.
+    */
+    adc_oneshot_unit_handle_t adc_init_start(void);
 
-    /* ---> STEP 4.1 : ADC Sampling -> adc.c */
-    // For FreeRTOS Task: ADC Sampling
+
+    /* FreeRTOS Task: Sampling */
+    /** 
+    * @brief Function to continuously sample raw EEG data from the ADC 
+    * at a fixed rate and push it into a FreeRTOS queue for processing 
+    * by the filtering task.
+    * @return None
+    */
     void adc_sampling(void *arg);
 
-    /* ---> STEP 4.2 : ADC Filtering -> adc.c */
-    // For FreeRTOS Task: Filtering + Detection
+
+    /* ADC-to-WebSocket Decoupling Interface (Transition Point) */
+    /** 
+    * @brief Function to pass the FreeRTOS queue handle from main.c to adc.c, 
+    * enabling the ADC module to push eeg_frame_t data to the WS Server module through this 
+    * shared queue without a direct dependency on the WS Server implementation.
+    * @return None
+    */
+    void adc_set_in_queue(QueueHandle_t queue);
+
+
+    /* FreeRTOS Task: Filtering */
+    /** 
+    * @brief Function to continuously filter the sampled EEG data and 
+    * detect cognitive states. 
+    * @return None
+    */
     void adc_filtering(void *arg);
 
-    // =============================
-    // Network Decoupling Interface (Transition Point)
-    // =============================
-    /**
-    * @brief 
-    * 
-    * 
-    * 
-    * 
-    */
 
-    void adc_set_output_queue(QueueHandle_t queue);
 
 #endif // ADC_H
 

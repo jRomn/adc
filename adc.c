@@ -35,7 +35,7 @@
     volatile int16_t blink_rise_threshold = 0; // The minimum absolute amplitude the filtered signal must reach to consider “a blink has started”
     volatile int16_t blink_fall_threshold = 0;// The lower amplitude the signal must drop below to consider “the blink has finished”.
 
-    static QueueHandle_t external_queue =   NULL;   // The "Bridge"
+    static QueueHandle_t external_queue =   NULL;   // The Decoupling Queue "Bridge"
 
 // =============================
 // Blink Adaptive Calibration Constants
@@ -64,7 +64,7 @@
     // =============================
     // Function to initialize the ADC unit, configure the channel, and set up calibration.
     // Returns a handle to the initialized ADC unit.
-    adc_oneshot_unit_handle_t adc_init(void){
+    adc_oneshot_unit_handle_t adc_init_start(void){
 
         esp_err_t ret;  // Error Status Code Type to stores the status returned by the Driver API Initialization Call.
 
@@ -210,8 +210,8 @@
     // =============================
     // 
     // =============================
-    /* Function to receive the queue handle from main.c */
-    void adc_set_output_queue(QueueHandle_t queue) {
+    /* Function to receive the Decoupling Queue handle from main.c */
+    void adc_set_in_queue(QueueHandle_t queue) {
         external_queue = queue;
     }
 
@@ -445,7 +445,3 @@
         cognitive_state = COGNITIVE_STATE_UNKNOWN;
         reset_filter_state();
     }
-
-
-
-
